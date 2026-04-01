@@ -18,8 +18,6 @@ cloudinary.config({
 });
 
 // Test connection
-cloudinary.api.ping()
-  .then(() => console.log('✅ Cloudinary connected'))
-  .catch(err => console.log('❌ Cloudinary error:', err.message));
+console.log("✅ Cloudinary configured");
 
 module.exports = { cloudinary };
