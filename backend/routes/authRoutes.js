@@ -30,20 +30,21 @@ router.get('/google', (req, res, next) => {
 router.get('/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_failed`
   }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    const user  = {
-      _id:        req.user._id,
-      name:       req.user.name,
-      email:      req.user.email,
-      role:       req.user.role,
-      sellerInfo: req.user.sellerInfo,
-    };
-    res.redirect(
-      `${process.env.FRONTEND_URL}/auth/google/success?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`
+
+    if (!req.user) {
+      return res.redirect(process.env.FRONTEND_URL);
+    }
+
+    const token = jwt.sign(
+      { id: req.user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
     );
+
+    res.redirect(`${process.env.FRONTEND_URL}/auth/google/success?token=${token}`);
   }
 );
 
