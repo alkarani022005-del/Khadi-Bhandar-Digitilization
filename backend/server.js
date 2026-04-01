@@ -13,7 +13,9 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', cred
 app.use(express.json());
 app.use(passport.initialize());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.get('/auth/google/success', (req, res) => {
+  res.send("Google Login Successful 🎉");
+});
 app.use('/api/auth',     require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders',   require('./routes/orderRoutes'));
