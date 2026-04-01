@@ -30,21 +30,37 @@ router.get('/google', (req, res, next) => {
 router.get('/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_failed`
+    failureRedirect: '/'
   }),
-  (req, res) => {
+  async (req, res) => {
 
-    if (!req.user) {
-      return res.redirect(process.env.FRONTEND_URL);
+    try {
+      if (!req.user) {
+        console.log("❌ No user from Google");
+        return res.send("Login failed");
+      }
+
+      console.log("✅ Google user:", req.user);
+
+      // ⚠️ SAFE ID (important)
+      const userId = req.user._id || req.user.id || "tempUser";
+
+      const token = jwt.sign(
+        { id: userId },
+        process.env.JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      // TEMP FIX (no frontend dependency)
+      return res.send(`
+        <h2>Login Successful 🎉</h2>
+        <p>Token: ${token}</p>
+      `);
+
+    } catch (err) {
+      console.log("🔥 ERROR:", err);
+      res.status(500).send("Internal Server Error");
     }
-
-    const token = jwt.sign(
-      { id: req.user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' }
-    );
-
-    res.redirect(`${process.env.FRONTEND_URL}/auth/google/success?token=${token}`);
   }
 );
 
